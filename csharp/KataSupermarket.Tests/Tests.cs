@@ -1,18 +1,11 @@
-﻿using NUnit.Framework;
+﻿using FsCheck.Xunit;
 
 namespace KataSupermarket.Tests
 {
     public class Tests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
-        [Test]
-        public void ShouldPass()
-        {
-            Assert.Pass();
-        }
+        [Property]
+        bool sum_is_commutative(int a, int b) => 
+            a + b == b + a;
     }
 }
