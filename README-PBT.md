@@ -35,27 +35,17 @@ Inspired from [Supermarket Kata](http://codekata.com/kata/kata01-supermarket-pri
     - [Add some more extra features](#add-some-more-extra-features)
 
 
-See [README PBT version](./README-PBT.md) for a version of these requirement defined as general rules, not resorting to any specific example.
-
 ## The kata
 
 In Jet Supermarket we have a checkout system that can do only one kind of offer,
-based on quantity of the same item (e.g., 1 apple for 50 cents, 3 apples for 1.30 dollars).
-At the moment items are priced individually in cents (e.g., 1 apple costs 50 cents),
-while some items are multi-priced: buy _x_ of them, and they’ll cost you _n_ cents.
+based on quantity of the same item: when products are purchased in larger quantities, they are available at a more favorable discounted price.
+At the moment items are priced individually in cents
+while some items are multi-priced: Purchase a specific quantity, and the cost per item decreases.
 
-The current prices are:
+The current prices can be defined at configuration time.
 
-|Item       | Unit Price  | Special Price |
-|-----------|-------------|---------------|
-| apple     | 50          | 3 for 130     |
-| pear      | 30          | 2 for 45      |
-| pineapple | 220         |               |
-| banana    | 60          |               |
-
-Our checkout system accepts items in any order, so that if we scan a pear, a pineapple,
-and another pear, we’ll recognize the two pears' offer and price them at 45 cents 
-(for a total price so far of 265 cents).   
+Our checkout system accepts items in any order, so shuffling the item in a purchase 
+will not change the grand total.
 Because the pricing changes frequently, we want to provide a set of pricing rules 
 each time we start handling a checkout transaction.
 
@@ -66,44 +56,46 @@ Then start implementing offers.
 
 ### The 1<sup>st</sup> User Story
 
-Let's start with apples.  
+Let's start with one single kind of product.
 
 ```markdown
 As a cashier, 
-I want a basic checkout system
-so I can let my customers pay for apples
+I wish my customers can pay for one kind of product
+so that the grand total, based on the product price, is displayed
 ```
 
 #### Acceptance Criteria
 
 ```markdown
-* When I checkout an apple, the system charges 50 cents
-* When I checkout 3 apples, the system charges 150 cents
+* When I checkout a product, the system charges its price
+* When I checkout `n` items of a product, the system charges `n` times its price
+* When I checkout more than 1 kind of product, the system raises an error
 ```
 
+Note: ideally, we could reduce this 1<sup>st</sup> User Story in 2 smaller ones:
+
+- A checkout system only able to display the product price, and still not capable of calculating the grand total (e.g., scanning twice the same product would not change the displayed value; the cashier would use the bare basic checkout system as a price reference, not yet as a calculator)
+- A checkout system capable of calculating the grand total
 ---
 
 ### The 2<sup>nd</sup> User Story
 
-Implement individual price for other fruits in list: _pear_, _pineapple_, _banana_.  
+Implement individual price for multiple kinds of product.
 No offers implemented, yet.  
 
 ```markdown
 As a cashier, 
-I want to add pear, pineapple and banana to the checkout system
+I want to scan products of different kinds and get the grand total
 so I can speed up the payment process
 ```
 
 #### Acceptance Criteria
 
 ```markdown
-* When I checkout 1 pear, the system charges 30 cents
-* When I checkout 1 pineapple, the system charges 220 cents
-* When I checkout 1 banana, the system charges 60 cents
+* When I checkout `1` product, the system charges its price
+* When I checkout `N` items of the same product, the system charges the grand total calculated as `N` times the product price
 
-* When I checkout 2 pears, the system charges 60 cents
-* When I checkout 2 pineapples, the system charges 440 cents
-* When I checkout 2 bananas, the system charges 120 cents
+* When I checkout more than 1 kind of product, the system calculates the grand total as the sum of the totals of each product type
 ```
 
 ---
@@ -112,37 +104,40 @@ so I can speed up the payment process
 
 Time to implement offers!
 
+First `N` are discounted:
+
 ```markdown
 As a cashier, 
 I want to specify offers for items
-so my customers will pay less for multiple items purchase
+so my customers enjoy savings when they surpass a certain quantity threshold in their purchases.
 ```
 
 #### Acceptance Criteria
 
 ```markdown
-* When I checkout 3 apples, the system charges 130 cents instead of 150
-* When I checkout 2 pears, the system charges 45 cents instead of 60
-* When I checkout 2 pineapples, the system charges 440 cents, as there are no offers for pineapples
+* When I checkout products for which no offer is defined, the standard grand total is calculated based on the price P
+* When an offer defined as `N products of type T is sold to the discounted cost D instead of the standard price P`
+  * purchasing less than `N` products of type `T` the standard grand total is calculated based on `P`
+  * purchasing exactly `N` products of type `T`, the total for that product is `N` times the discounted price `D`
+  * purchasing more than `N` products of type `T`, the discount is applied only to the first `N`; the rest are priced `D` as usual
 ```
 
 ### The 4<sup>th</sup> User Story
-Take 3 pay offer.  
+Take `N` pay `D` offer.
 
 ```markdown
 As a cashier,
-I want to add a "take 3 pay 2 offer" kind for items
+I want to add a "take `N` pay `D` offer" kind of offer for items
 so my customers will pay less for multiple items purchase
 ```
+
 
 #### Acceptance Criteria
 
 ```markdown
-For the first step, I only want to apply this offers for oranges:
-* When I checkout 1 orange, the system charges 45
-* When I checkout 3 oranges, the system charges 90 cents instead of 135
-* When I checkout 4 oranges, the system charges 135 cents instead of 180
-* When I checkout 6 oranges, the system charges 180 cents instead of 270
+As before, plus:
+
+* each group of `N` Products qualifies for a discounted price `D`. Any Products beyond the multiples of `N` are priced at the ordinary rate `P`.
 ```
 
 ---
@@ -151,19 +146,20 @@ Combo offers.
 
 ```markdown
 As a cashier, 
-I want to specify this offer: 4 apples, 2 pears, 2 bananas and 1 pineapple for 500
-so my customers can make delicious fruit salads :)
+I want to create a customized offer where customers must purchase a specific quantity of each product type to qualify for a discounted price
+so that my customers are encouraged to purchase more products.
 ```
+
 
 #### Acceptance Criteria
 
+* If the offer is defined as:
+
 ```markdown
-* When I checkout EXACTLY 4 apples, 2 pears, 2 bananas and 1 pineapple, the system charges 500
-* All other offers and base prices remains in place
-* When I checkout 8 apples, 4 pears, 4 bananas and 2 pineapple, the system charges 1000
-* When I checkout 5 apples, 3 pears, 3 bananas and 2 pineapple, the system charges 860 (500+50+30+220+60)
-* When I checkout 7 apples, 2 pears, 2 bananas and 1 pineapple, the system charges 630 (500+130)
+N1 of Product1, N2 of Product2, N3 of Product3, ..., cost D
 ```
+
+then each group of `N1 of Product1, N2 of Product2, N3 of Product3, ...` results in the system charging the specified cost `D`.
 
 ## Go big
 
