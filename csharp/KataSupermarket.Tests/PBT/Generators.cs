@@ -4,7 +4,7 @@ using FsCheck;
 
 namespace KataSupermarket.Tests.PBT;
 
-public class Generators
+public static class Generators
 {
     public static Gen<int> PositiveInt() =>
         from value in Arb.Generate<int>()
