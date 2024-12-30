@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace KataSupermarket.Tests;
+namespace KataSupermarket.Tests.TDD;
 
 public class TddTests
 {
