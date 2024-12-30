@@ -1,5 +1,4 @@
-using System;
-using KataSupermarket.Tests.PBT;
+namespace KataSupermarket.Tests.PBT;
 
 public class CashRegisterPbt
 {
