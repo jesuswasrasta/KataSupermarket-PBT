@@ -1,6 +1,7 @@
 ﻿using System;
 using FsCheck;
 using FsCheck.Xunit;
+using KataSupermarket.Tests.PBT.Generators;
 using KataSupermarket.Tests.PBT.UseCases;
 using KataSupermarket.Tests.TDD;
 using static FsCheck.Prop;
@@ -9,42 +10,82 @@ namespace KataSupermarket.Tests.PBT
 {
     public class Tests
     {
-        // Story 1: only apples, without offers
-        // Example: 1 apple, 50cc
-        // n apples = n * apples
-        // grand total >= 0
-        // scanning a product other than an apple => raise an exception
+        /*
+         Story 1 PBT:
+        
+         As a cashier,
+         I wish my customers can pay for one kind of product
+         so that the grand total, based on the product price, is displayed
+        
+         scanning a product other than an apple => raise an exception
+        */
+                
         [Property]
-        private bool n_apples_cost_n_times_50(PositiveInt positiveInt)
+        private bool product_price_is_positive()
         {
+            /* Ha senso questa proprietà? Sì, perché il prezzo di un prodotto non può essere negativo.
+             * Ma qui gli passo io un prezzo positivo...
+             */
+            string product = StringGenerator.NonBlankAlphaNumericString().ToString();
+            int price = IntGenerator.PositiveInt().ToInt();
+            
             var cashRegister = new CashRegisterPbt();
-            int numberOfApples = positiveInt.Item;
-
-            for (var i = 1; i <= numberOfApples; i++)
-            {
-                cashRegister.Scan(new Product("apple", 50));
-            }
-
-            var grandTotal = cashRegister.Checkout();
-
-            return grandTotal == 50 * numberOfApples;
-        }
-
-        [Property]
-        private bool grand_total_for_apples_is_positive(PositiveInt positiveInt)
-        {
-            var cashRegister = new CashRegisterPbt();
-
-            var numberOfApples = positiveInt.Item;
-
-            for (var i = 0; i <= numberOfApples; i++)
-            {
-                cashRegister.Scan(new Product("apple", 50));
-            }
-
+            cashRegister.Scan(new Product(product, price));
             var grandTotal = cashRegister.Checkout();
 
             return grandTotal > 0;
+        }
+
+        [Property]
+        private bool product_price_is_positive_v2()
+        {
+            /* Come prima, visto che mi faccio generare un prodotto valido 
+             */
+            var product = ProductGenerator.Product().ToProduct();
+            
+            var cashRegister = new CashRegisterPbt();
+            cashRegister.Scan(product);
+            var grandTotal = cashRegister.Checkout();
+
+            return grandTotal > 0;
+        }
+        
+        [Property]
+        private bool scan_one_product_then_grand_total_equals_product_price()
+        {
+            /* Proprietà un pelo più precisa, ma di nuovo testo i generators...
+             */
+            var product = ProductGenerator.Product().ToProduct();
+            
+            var cashRegister = new CashRegisterPbt();
+            cashRegister.Scan(product);
+            var grandTotal = cashRegister.Checkout();
+
+            return grandTotal > 0 && grandTotal == product.Price;
+        }
+        
+        [Property(DisplayName = "Scan a product with negative price throws exception")]
+        private Property scan_a_product_with_negative_price_throws_exception()
+        {
+            /* C'è un modo migliore per testare questa proprietà?
+             * E le eccezioni in generale?
+             */
+            
+            var productArbitrary = ProductGenerator.InvalidPriceProduct().ToArbitrary();
+
+            return Prop.ForAll(productArbitrary, product =>
+            {
+                var cashRegister = new CashRegisterPbt();
+                try
+                {
+                    cashRegister.Scan(product);
+                    return false; // If no exception is thrown, the test fails
+                }
+                catch (ArgumentException)
+                {
+                    return true; // If ArgumentException is thrown, the test passes
+                }
+            });
         }
 
         // [Property]
@@ -156,10 +197,10 @@ namespace KataSupermarket.Tests.PBT
         private Property offer_does_not_trigger()
         {
             var useCases = Arb.From(
-                from quantity in Generators.PositiveIntBiggerThan(1000)
-                from product in Generators.Product()
-                from offer in Generators.OfferForProduct(quantity, product)
-                from numberOfItems in Generators.PositiveIntSmallerThan(quantity)
+                from quantity in IntGenerator.PositiveIntBiggerThan(1000)
+                from product in ProductGenerator.Product()
+                from offer in OfferGenerator.OfferForProduct(quantity, product)
+                from numberOfItems in IntGenerator.PositiveIntSmallerThan(quantity)
                 select new UseCase<Product, Offer, int>(product, offer, numberOfItems));
 
             bool CheckGrandTotal(UseCase<Product, Offer, int> useCase)
@@ -183,10 +224,10 @@ namespace KataSupermarket.Tests.PBT
         private Property offer_does_triggers()
         {
             var useCases = Arb.From(
-                from quantity in Generators.PositiveIntBiggerThan(1000)
-                from product in Generators.Product()
-                from offer in Generators.OfferForProduct(quantity, product)
-                from numberOfItems in Generators.PositiveIntSmallerThan(offer.MinimumQuantity)
+                from quantity in IntGenerator.PositiveIntBiggerThan(1000)
+                from product in ProductGenerator.Product()
+                from offer in OfferGenerator.OfferForProduct(quantity, product)
+                from numberOfItems in IntGenerator.PositiveIntSmallerThan(offer.MinimumQuantity)
                 select new UseCase<Product, Offer, int>(product, offer, numberOfItems));
 
             bool CheckGrandTotal(UseCase<Product, Offer, int> useCase)

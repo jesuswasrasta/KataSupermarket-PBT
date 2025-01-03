@@ -17,6 +17,11 @@ public class CashRegisterPbt
 
     internal void Scan(Product product)
     {
+        if (product.Price <= 0)
+        {
+            throw new ArgumentException("Product price must be 1 or more");
+        }
+        
         _product = product;
         _count++;
     }
