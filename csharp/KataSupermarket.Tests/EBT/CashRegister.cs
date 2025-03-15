@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KataSupermarket.Tests.TDD;
+namespace KataSupermarket.Tests.EBT;
 
 public class CashRegister
 {

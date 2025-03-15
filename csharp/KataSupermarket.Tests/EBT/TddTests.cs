@@ -1,11 +1,11 @@
 ﻿using Xunit;
 
-namespace KataSupermarket.Tests.TDD;
+namespace KataSupermarket.Tests.EBT;
 
 public class TddTests
 {
-    [Fact]
-    void an_apple_costs_50_cc()
+    [Fact (DisplayName = "An apple costs 50 cents")]
+    void an_apple_costs_50_cents()
     {
         var cashRegister = new CashRegister();
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using FsCheck;
 using FsCheck.Xunit;
+using KataSupermarket.Tests.EBT;
 using KataSupermarket.Tests.PBT.Generators;
 using KataSupermarket.Tests.PBT.UseCases;
-using KataSupermarket.Tests.TDD;
 using static FsCheck.Prop;
 
 namespace KataSupermarket.Tests.PBT
