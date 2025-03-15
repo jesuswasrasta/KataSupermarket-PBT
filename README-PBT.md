@@ -67,14 +67,18 @@ so that the grand total, based on the product price, is displayed
 #### Acceptance Criteria
 
 ```markdown
-* When I checkout a product, the system charges its price
-* When I checkout `n` items of a product, the system charges `n` times its price
-* When I checkout more than 1 kind of product, the system raises an error
+* When I check out a product, the system charges its price
+* When I check out `n` items of a product, the system charges `n` times its price
+* When I check out more than 1 kind of product, the system raises an error
 ```
 
-Note: ideally, we could reduce this 1<sup>st</sup> User Story in 2 smaller ones:
+Note: we could reduce this 1<sup>st</sup> User Story in 2 smaller ones:
 
-- A checkout system only able to display the product price, and still not capable of calculating the grand total (e.g., scanning twice the same product would not change the displayed value; the cashier would use the bare basic checkout system as a price reference, not yet as a calculator)
+- A checkout system only able to display the product price, 
+  and still not capable of calculating the grand total 
+  (e.g., scanning twice the same product would not change the displayed value; 
+  the cashier would use the bare basic checkout system as a price reference, 
+  not yet as a calculator).
 - A checkout system capable of calculating the grand total
 ---
 
@@ -92,10 +96,12 @@ so I can speed up the payment process
 #### Acceptance Criteria
 
 ```markdown
-* When I checkout `1` product, the system charges its price
-* When I checkout `N` items of the same product, the system charges the grand total calculated as `N` times the product price
+* When I check out `1` product, the system charges its price
+* When I check out `N` items of the same product, 
+  the system charges the grand total calculated as `N` times the product price
 
-* When I checkout more than 1 kind of product, the system calculates the grand total as the sum of the totals of each product type
+* When I check out more than 1 kind of product, 
+  the system calculates the grand total as the sum of the totals of each product type
 ```
 
 ---
@@ -109,13 +115,14 @@ First `N` are discounted:
 ```markdown
 As a cashier, 
 I want to specify offers for items
-so my customers enjoy savings when they surpass a certain quantity threshold in their purchases.
+so my customers enjoy savings when they surpass 
+a certain quantity threshold in their purchases.
 ```
 
 #### Acceptance Criteria
 
 ```markdown
-* When I checkout products for which no offer is defined, the standard grand total is calculated based on the price P
+* When I check out products for which no offer is defined, the standard grand total is calculated based on the price P
 * When an offer defined as `N products of type T is sold to the discounted cost D instead of the standard price P`
   * purchasing less than `N` products of type `T` the standard grand total is calculated based on `P`
   * purchasing exactly `N` products of type `T`, the total for that product is `N` times the discounted price `D`
